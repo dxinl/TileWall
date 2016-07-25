@@ -16,7 +16,7 @@ import android.widget.BaseAdapter;
 
 /**
  * Created by Deng Xinliang on 2016/7/22.
- *
+ * <p>
  * Tile wall widget.
  */
 public class TileWall extends AdapterView<BaseAdapter> {
@@ -31,6 +31,11 @@ public class TileWall extends AdapterView<BaseAdapter> {
     private int numOfRows;
     private int dividerColor;
     private float dividerWidth;
+    /**
+     * This flag will work only when both width measure spec mode and height measure spec mode
+     * are {@link MeasureSpec#EXACTLY}.
+     */
+    private boolean forceDividing;
 
     public TileWall(Context context) {
         this(context, null);
@@ -65,6 +70,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
         dividerColor = typedArray.getColor(
                 R.styleable.TileWall_dividerColor,
                 getResources().getColor(R.color.gray_400));
+        forceDividing = typedArray.getBoolean(R.styleable.TileWall_forceDividing, false);
         typedArray.recycle();
 
         paint = new Paint();
@@ -127,6 +133,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
         if (widthMode == MeasureSpec.UNSPECIFIED || widthMode == MeasureSpec.AT_MOST) {
+            forceDividing = false;
             int totalWidth = measureChildrenWidth(widthMeasureSpec, heightMeasureSpec);
 
             // To show all items, we must check whether total height is too large to show.
@@ -138,6 +145,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
         }
 
         if (heightMode == MeasureSpec.UNSPECIFIED || heightMode == MeasureSpec.AT_MOST) {
+            forceDividing = false;
             int totalHeight = measureChildrenHeight(widthMeasureSpec, heightMeasureSpec);
 
             // To show all items, we must check whether total height is too large to show.
@@ -341,7 +349,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
 
         int width;
         int height;
-        if (count < numOfColumns) {
+        if (!forceDividing && count < numOfColumns) {
             int totalDividerWidth = (int) (dividerWidth * (count + 1));
             int totalDividerHeight = (int) (dividerWidth * 2);
             width = (getWidth() - totalDividerWidth - paddingHorizontal) / count;
@@ -351,7 +359,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
             width = (getWidth() - totalDividerWidth - paddingHorizontal) / numOfColumns;
 
             int rowsCount = count / numOfColumns + (count % numOfColumns > 0 ? 1 : 0);
-            if (rowsCount < numOfRows) {
+            if (!forceDividing && rowsCount < numOfRows) {
                 int totalDividerHeight = (int) (dividerWidth * (rowsCount + 1));
                 height = (getHeight() - totalDividerHeight - paddingVertical) / rowsCount;
             } else {
@@ -469,6 +477,12 @@ public class TileWall extends AdapterView<BaseAdapter> {
     @SuppressWarnings("unused")
     public TileWall setDividerColor(int resId) {
         dividerColor = getResources().getColor(resId);
+        return this;
+    }
+
+    @SuppressWarnings("unused")
+    public TileWall setForceDividing(boolean forceDividing) {
+        this.forceDividing = forceDividing;
         return this;
     }
 
