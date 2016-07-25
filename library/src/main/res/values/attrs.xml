@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="TileWall">
+        <attr name="numOfColumns" format="integer"/>
+        <attr name="numOfRows" format="integer"/>
+        <attr name="dividerColor" format="integer"/>
+        <attr name="dividerWidth" format="dimension"/>
+    </declare-styleable>
+</resources>
