@@ -8,7 +8,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -425,10 +424,8 @@ public class TileWall extends AdapterView<BaseAdapter> {
 
     @Override
     protected void onDraw(Canvas canvas) {
-        Log.e("xxx", "xxxx1");
         super.onDraw(canvas);
         if (dividerWidth > 0) {
-            Log.e("xxx", "xxxx2");
             drawDivider(canvas);
         }
     }
