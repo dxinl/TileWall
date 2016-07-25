@@ -8,7 +8,6 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,7 +31,6 @@ public class TileWall extends AdapterView<BaseAdapter> {
     private int numOfRows;
     private int dividerColor;
     private float dividerWidth;
-    private LayoutParams childLayoutParams;
 
     public TileWall(Context context) {
         this(context, null);
@@ -72,9 +70,6 @@ public class TileWall extends AdapterView<BaseAdapter> {
         paint = new Paint();
         paint.setAntiAlias(true);
         paint.setStyle(Paint.Style.STROKE);
-
-        childLayoutParams = new LayoutParams(
-                LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
 
         mDataSetObserver = new DataSetObserver() {
             @Override
