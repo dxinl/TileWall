@@ -7,6 +7,7 @@ import android.database.DataSetObserver;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.os.Build;
+import android.support.annotation.ColorRes;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -472,7 +473,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
     }
 
     @SuppressWarnings("unused")
-    public TileWall setDividerColor(int resId) {
+    public TileWall setDividerColor(@ColorRes int resId) {
         dividerColor = getResources().getColor(resId);
         return this;
     }
