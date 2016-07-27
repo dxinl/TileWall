@@ -113,19 +113,21 @@ public class TileWall extends AdapterView<BaseAdapter> {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int count = getChildCount();
+        boolean needToUpdateView = true;
         if (changedAdapter) {
             addNewChildren();
             changedAdapter = false;
-            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
-            return;
+            needToUpdateView = false;
         } else if (count < mAdapter.getCount()) {
             addChildren();
         } else if (count > mAdapter.getCount()) {
             removeChildren();
         }
 
-        final int newCount = getChildCount();
-        updateChildren(count < newCount ? count : newCount);
+        if (needToUpdateView) {
+            final int newCount = getChildCount();
+            updateChildren(count < newCount ? count : newCount);
+        }
 
         final int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         final int heightMode = MeasureSpec.getMode(heightMeasureSpec);
