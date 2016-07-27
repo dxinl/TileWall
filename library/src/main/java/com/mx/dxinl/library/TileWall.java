@@ -401,28 +401,16 @@ public class TileWall extends AdapterView<BaseAdapter> {
         return params instanceof LayoutParams;
     }
 
-    /**
-     * This method is not supported.
-     *
-     * @return ignored
-     * @throws UnsupportedOperationException
-     */
     @Deprecated
     @Override
     public View getSelectedView() {
-        throw new UnsupportedOperationException("getSelectedView() is not supported in TileWallLayout.");
+        return null;
     }
 
-    /**
-     * This method is not supported.
-     *
-     * @param position ignored
-     * @throws UnsupportedOperationException
-     */
     @Deprecated
     @Override
     public void setSelection(int position) {
-        throw new UnsupportedOperationException("setSelection(int) is not supported in TileWallLayout.");
+        
     }
 
     @Override
