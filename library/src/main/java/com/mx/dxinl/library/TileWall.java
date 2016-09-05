@@ -64,9 +64,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
                 R.styleable.TileWall_numOfRows, DEF_NUM_OF_ROW_AND_COLUMNS);
         numOfColumns = typedArray.getInt(
                 R.styleable.TileWall_numOfColumns, DEF_NUM_OF_ROW_AND_COLUMNS);
-        dividerWidth = typedArray.getDimension(
-                R.styleable.TileWall_dividerWidth,
-                getResources().getDimension(R.dimen.deafult_divider_width));
+        dividerWidth = typedArray.getDimension(R.styleable.TileWall_dividerWidth, 1);
         dividerColor = typedArray.getColor(
                 R.styleable.TileWall_dividerColor,
                 getResources().getColor(R.color.gray_400));
@@ -410,7 +408,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
     @Deprecated
     @Override
     public void setSelection(int position) {
-        
+
     }
 
     @Override
@@ -425,7 +423,6 @@ public class TileWall extends AdapterView<BaseAdapter> {
         int count = getChildCount();
         paint.setColor(dividerColor);
         paint.setStrokeWidth(dividerWidth);
-        int halfDividerWidth = (int) (dividerWidth / 2f);
 
         for (int i = 0; i < count; i++) {
             View child = getChildAt(i);
@@ -433,14 +430,22 @@ public class TileWall extends AdapterView<BaseAdapter> {
                 continue;
             }
 
-            int left = child.getLeft() - halfDividerWidth;
-            int top = child.getTop() - halfDividerWidth;
-            int right = child.getRight() + halfDividerWidth;
-            int bottom = child.getBottom() + halfDividerWidth;
-            canvas.drawLine(left, top - halfDividerWidth, left, bottom + halfDividerWidth, paint);
-            canvas.drawLine(left - halfDividerWidth, top, right + halfDividerWidth, top, paint);
-            canvas.drawLine(right, top - halfDividerWidth, right, bottom + halfDividerWidth, paint);
-            canvas.drawLine(left - halfDividerWidth, bottom, right + halfDividerWidth, bottom, paint);
+            int left = child.getLeft();
+            int top = child.getTop();
+            int right = child.getRight();
+            int bottom = child.getBottom();
+            // Elements in first column draw left divider
+            if (i % numOfColumns == 0) {
+                canvas.drawLine(left, top - dividerWidth, left, bottom + dividerWidth, paint);
+            }
+            // Elements in first row draw top divider
+            if (i < numOfColumns) {
+                canvas.drawLine(left - dividerWidth, top, right + dividerWidth, top, paint);
+            }
+
+            // All elements draw right and bottom divider
+            canvas.drawLine(right, top - dividerWidth, right, bottom + dividerWidth, paint);
+            canvas.drawLine(left - dividerWidth, bottom, right + dividerWidth, bottom, paint);
         }
     }
 
