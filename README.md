@@ -28,6 +28,7 @@ mTileWall.setAdapter(new BaseAdaper() {...});
     app:numOfColumns="3"
     app:numOfRows="3" />
 ```
+This view support multi view type also.
 
 ### Notice
 ```setForceDividing(boolean)``` will work only when both width measure spec mode and height measure spec mode are ```MeasureSpec.EXACTLY```.
