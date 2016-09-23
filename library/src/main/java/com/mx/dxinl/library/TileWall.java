@@ -36,6 +36,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
      * are {@link MeasureSpec#EXACTLY}.
      */
     private boolean forceDividing;
+    private boolean needToUpdateView;
 
     public TileWall(Context context) {
         this(context, null);
@@ -78,11 +79,13 @@ public class TileWall extends AdapterView<BaseAdapter> {
         mDataSetObserver = new DataSetObserver() {
             @Override
             public void onChanged() {
+                needToUpdateView = true;
                 requestLayout();
             }
 
             @Override
             public void onInvalidated() {
+                needToUpdateView = true;
                 requestLayout();
             }
         };
@@ -111,7 +114,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int count = getChildCount();
-        boolean needToUpdateView = true;
+        needToUpdateView = true;
         if (changedAdapter) {
             addNewChildren();
             changedAdapter = false;
@@ -482,20 +485,22 @@ public class TileWall extends AdapterView<BaseAdapter> {
     private static final class LayoutParams extends ViewGroup.LayoutParams {
         int viewType;
 
-        public LayoutParams(Context c, AttributeSet attrs) {
+        @SuppressWarnings("unused")
+        LayoutParams(Context c, AttributeSet attrs) {
             super(c, attrs);
         }
 
-        public LayoutParams(int width, int height) {
+        @SuppressWarnings("unused")
+        LayoutParams(int width, int height) {
             super(width, height);
         }
 
-        public LayoutParams(int width, int height, int viewType) {
+        LayoutParams(int width, int height, int viewType) {
             super(width, height);
             this.viewType = viewType;
         }
 
-        public LayoutParams(ViewGroup.LayoutParams source) {
+        LayoutParams(ViewGroup.LayoutParams source) {
             super(source);
         }
     }
