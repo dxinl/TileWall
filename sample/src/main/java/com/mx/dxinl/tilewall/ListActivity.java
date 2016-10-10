@@ -42,7 +42,7 @@ public class ListActivity extends AppCompatActivity {
         listView.setAdapter(new BaseAdapter() {
             @Override
             public int getCount() {
-                return 11;
+                return 1111111;
             }
 
             @Override

@@ -98,6 +98,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
 
     @Override
     public void setAdapter(BaseAdapter adapter) {
+        needToUpdateView = true;
         if (mAdapter != null) {
             mAdapter.unregisterDataSetObserver(mDataSetObserver);
         }
@@ -114,7 +115,6 @@ public class TileWall extends AdapterView<BaseAdapter> {
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         int count = getChildCount();
-        needToUpdateView = true;
         if (changedAdapter) {
             addNewChildren();
             changedAdapter = false;
@@ -128,35 +128,63 @@ public class TileWall extends AdapterView<BaseAdapter> {
         if (needToUpdateView) {
             final int newCount = getChildCount();
             updateChildren(count < newCount ? count : newCount);
+            needToUpdateView = false;
         }
 
         final int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         final int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+
+        // If both width measure mode and height measure mode are EXACTLY,
+        // do not need to calculate width and height anymore.
+        if (widthMode == MeasureSpec.EXACTLY && heightMode == MeasureSpec.EXACTLY) {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            return;
+        }
+
+        forceDividing = false;
+
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
-        if (widthMode == MeasureSpec.UNSPECIFIED || widthMode == MeasureSpec.AT_MOST) {
-            forceDividing = false;
-            int totalWidth = measureChildrenWidth(widthMeasureSpec, heightMeasureSpec);
+        int totalWidth = measureChildrenWidth(widthMeasureSpec, heightMeasureSpec);
+        int totalHeight = measureChildrenHeight(widthMeasureSpec, heightMeasureSpec);
 
-            // To show all items, we must check whether total height is too large to show.
-            // If yes, we shall decrease it.
+        int realWidth = widthSize;
+        if (widthMode == MeasureSpec.UNSPECIFIED || widthMode == MeasureSpec.AT_MOST) {
+            // To show all items, must check whether total width is too large to show.
+            // If yes, reduce it.
             if (widthMode == MeasureSpec.AT_MOST && totalWidth > widthSize) {
-                totalWidth = widthSize;
+                realWidth = widthSize;
+            } else {
+                realWidth = totalWidth;
             }
-            widthMeasureSpec = MeasureSpec.makeMeasureSpec(totalWidth, MeasureSpec.EXACTLY);
+            widthMeasureSpec = MeasureSpec.makeMeasureSpec(realWidth, MeasureSpec.EXACTLY);
         }
 
+        int realHeight = heightSize;
         if (heightMode == MeasureSpec.UNSPECIFIED || heightMode == MeasureSpec.AT_MOST) {
-            forceDividing = false;
-            int totalHeight = measureChildrenHeight(widthMeasureSpec, heightMeasureSpec);
-
-            // To show all items, we must check whether total height is too large to show.
-            // If yes, we shall decrease it.
+            // To show all items, must check whether total height is too large to show.
+            // If yes, reduce it.
             if (heightMode == MeasureSpec.AT_MOST && totalHeight > heightSize) {
-                totalHeight = heightSize;
+                realHeight = heightSize;
+            } else {
+                realHeight = totalHeight;
             }
-            heightMeasureSpec = MeasureSpec.makeMeasureSpec(totalHeight, MeasureSpec.EXACTLY);
+            heightMeasureSpec = MeasureSpec.makeMeasureSpec(realHeight, MeasureSpec.EXACTLY);
+        }
+
+        // If width measure mode is UNSPECIFIED, reduce width basing on height;
+        // Else if height measure mode is UNSPECIFIED, reduce height basing on width.
+        if (widthMode == MeasureSpec.UNSPECIFIED && heightMode != MeasureSpec.UNSPECIFIED) {
+            if (totalHeight > realHeight) {
+                realWidth = (int) (totalWidth * realHeight / (float) totalHeight);
+                widthMeasureSpec = MeasureSpec.makeMeasureSpec(realWidth, MeasureSpec.EXACTLY);
+            }
+        } else if (widthMode != MeasureSpec.UNSPECIFIED && heightMode == MeasureSpec.UNSPECIFIED) {
+            if (totalWidth > realWidth) {
+                realHeight = (int) (totalHeight * realWidth / (float) totalWidth);
+                heightMeasureSpec = MeasureSpec.makeMeasureSpec(realHeight, MeasureSpec.EXACTLY);
+            }
         }
 
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
