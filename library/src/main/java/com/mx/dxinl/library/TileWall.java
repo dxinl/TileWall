@@ -9,7 +9,10 @@ import android.graphics.Paint;
 import android.os.Build;
 import android.support.annotation.ColorRes;
 import android.util.AttributeSet;
+import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
@@ -30,6 +33,9 @@ public class TileWall extends AdapterView<BaseAdapter> {
     private int numOfColumns;
     private int numOfRows;
     private int dividerColor;
+    private int touchSlop;
+    private float downMotionX;
+    private float downMotionY;
     private float dividerWidth;
     /**
      * This flag will work only when both width measure spec mode and height measure spec mode
@@ -37,6 +43,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
      */
     private boolean forceDividing;
     private boolean needToUpdateView;
+    private boolean isDragging;
 
     public TileWall(Context context) {
         this(context, null);
@@ -59,6 +66,8 @@ public class TileWall extends AdapterView<BaseAdapter> {
 
     private void init(AttributeSet attrs) {
         setWillNotDraw(false);
+
+        touchSlop = ViewConfiguration.get(getContext()).getScaledPagingTouchSlop();
 
         TypedArray typedArray = getContext().obtainStyledAttributes(attrs, R.styleable.TileWall);
         numOfRows = typedArray.getInt(
@@ -245,6 +254,91 @@ public class TileWall extends AdapterView<BaseAdapter> {
             }
         });
     }
+    
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                downMotionX = event.getX();
+                downMotionY = event.getY();
+                return true;
+
+            case MotionEvent.ACTION_MOVE:
+                if (isDragging) {
+                    return super.onTouchEvent(event);
+                }
+
+                float distX = event.getX() - downMotionX;
+                float distY = event.getY() - downMotionY;
+                if (isStartDragging(distX, distY)) {
+                    isDragging = true;
+                    return super.onTouchEvent(event);
+                }
+                return true;
+
+            case MotionEvent.ACTION_UP:
+                if (!isDragging) {
+                    int position = findMotionItem(event.getX(), event.getY());
+                    if (position >= 0) {
+                        performItemClick(getChildAt(position), position, mAdapter.getItemId(position));
+                        return true;
+                    }
+                } else {
+                    isDragging = false;
+                }
+        }
+        return super.onTouchEvent(event);
+    }
+
+    private boolean isStartDragging(float distX, float distY) {
+        return distX * distX + distY * distY > touchSlop * touchSlop;
+    }
+
+    private int findMotionItem(float x, float y) {
+        int width = getWidth();
+        int height = getHeight();
+        int count = getChildCount();
+        int columnsNum = numOfColumns;
+        int rowsNum = numOfRows;
+        float unitWidth;
+        float unitHeight;
+        if (forceDividing || count == numOfColumns * numOfRows) {
+            unitWidth = (float) width / numOfColumns;
+            unitHeight = (float) height / numOfRows;
+        } else if (count <= numOfColumns) {
+            unitWidth = (float) width / count;
+            unitHeight = height;
+            columnsNum = count;
+            rowsNum = 1;
+        } else {
+            unitWidth = (float) width / numOfColumns;
+            rowsNum = count / numOfColumns + (count % numOfColumns > 0 ? 1: 0);
+            unitHeight = (float) width / rowsNum;
+        }
+
+        int columnIndex = -1;
+        while (columnIndex < columnsNum) {
+            columnIndex++;
+            if (x > unitWidth * columnIndex && x < unitWidth * (columnIndex + 1)) {
+                break;
+            }
+        }
+
+        int rowIndex = -1;
+        while (rowIndex < rowsNum) {
+            rowIndex++;
+            if (y > unitHeight * rowIndex && y < unitHeight * (rowIndex + 1)) {
+                break;
+            }
+        }
+
+        int index = rowIndex * columnsNum + columnIndex;
+        if (index < 0 || index >= count) {
+            return INVALID_POSITION;
+        } else {
+            return index;
+        }
+    }
 
     private void removeChildren() {
         int count = getChildCount();
@@ -272,7 +366,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
     private void updateChildren(int count) {
         if (count > getChildCount()) {
             throw new IllegalArgumentException(
-                    "The argument(count) cannot be larger than children's count in TileWallLayout.");
+                    "The argument(count) cannot be larger than children's count in TileWall.");
         }
 
         for (int i = 0; i < count; i++) {
