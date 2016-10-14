@@ -288,6 +288,9 @@ public class TileWall extends AdapterView<BaseAdapter> {
                 return true;
 
             case MotionEvent.ACTION_CANCEL:
+                if (isDragging) {
+                    isDragging = false;
+                }
                 resetPressedChild();
                 break;
 
