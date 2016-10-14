@@ -43,7 +43,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="@dimen/activity_horizontal_margin"
-            app:dividerColor="@color/gray_400"
+            app:dividerColor="@color/grey_400"
             app:dividerWidth="@dimen/test_divider_width_1"
             app:numOfColumns="3"
             app:numOfRows="3" />

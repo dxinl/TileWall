@@ -9,7 +9,6 @@ import android.graphics.Paint;
 import android.os.Build;
 import android.support.annotation.ColorRes;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewConfiguration;
@@ -44,6 +43,16 @@ public class TileWall extends AdapterView<BaseAdapter> {
     private boolean forceDividing;
     private boolean needToUpdateView;
     private boolean isDragging;
+    private String tag = TileWall.class.getSimpleName();
+
+    /**
+     * Reference of child that user taps on.
+     */
+    private View pressedChild;
+    /**
+     * Position of child that user taps on.
+     */
+    private int pressedPosition;
 
     public TileWall(Context context) {
         this(context, null);
@@ -77,7 +86,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
         dividerWidth = typedArray.getDimension(R.styleable.TileWall_dividerWidth, 1);
         dividerColor = typedArray.getColor(
                 R.styleable.TileWall_dividerColor,
-                getResources().getColor(R.color.gray_400));
+                getResources().getColor(R.color.grey_400));
         forceDividing = typedArray.getBoolean(R.styleable.TileWall_forceDividing, false);
         typedArray.recycle();
 
@@ -230,7 +239,6 @@ public class TileWall extends AdapterView<BaseAdapter> {
             lp.viewType = mAdapter.getItemViewType(i);
             child.setLayoutParams(lp);
 
-            setOnChildClickListener(child, i);
             addViewInLayout(child, i, lp, true);
         }
     }
@@ -246,54 +254,63 @@ public class TileWall extends AdapterView<BaseAdapter> {
         return new LayoutParams(p);
     }
 
-    private void setOnChildClickListener(View child, final int position) {
-        child.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                performItemClick(v, position, v.getId());
-            }
-        });
-    }
-    
     @Override
     public boolean onTouchEvent(MotionEvent event) {
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 downMotionX = event.getX();
                 downMotionY = event.getY();
+                pressedPosition = findMotionItem(event.getX(), event.getY());
+                if (pressedPosition != INVALID_POSITION) {
+                    pressedChild = getChildAt(pressedPosition);
+                    pressedChild.setPressed(true);
+                }
                 return true;
 
             case MotionEvent.ACTION_MOVE:
-                if (isDragging) {
-                    return super.onTouchEvent(event);
+                float moveX = event.getX();
+                float moveY = event.getY();
+                if (pressedPosition != INVALID_POSITION && isOutOfChildBounds(moveX, moveY)) {
+                    resetPressedChild();
+                    return false;
                 }
 
-                float distX = event.getX() - downMotionX;
-                float distY = event.getY() - downMotionY;
+                if (isDragging) {
+                    return false;
+                }
+
+                float distX = moveX - downMotionX;
+                float distY = moveY - downMotionY;
                 if (isStartDragging(distX, distY)) {
                     isDragging = true;
-                    return super.onTouchEvent(event);
+                    return false;
                 }
                 return true;
 
+            case MotionEvent.ACTION_CANCEL:
+                resetPressedChild();
+                break;
+
             case MotionEvent.ACTION_UP:
-                if (!isDragging) {
-                    int position = findMotionItem(event.getX(), event.getY());
-                    if (position >= 0) {
-                        performItemClick(getChildAt(position), position, mAdapter.getItemId(position));
-                        return true;
-                    }
+                if (!isDragging && pressedPosition != INVALID_POSITION) {
+                    performItemClick(pressedChild, pressedPosition, mAdapter.getItemId(pressedPosition));
+                    pressedChild.setPressed(false);
+                    return true;
                 } else {
                     isDragging = false;
+                    resetPressedChild();
                 }
         }
-        return super.onTouchEvent(event);
+        return false;
     }
 
-    private boolean isStartDragging(float distX, float distY) {
-        return distX * distX + distY * distY > touchSlop * touchSlop;
-    }
-
+    /**
+     * Find out which child user tapped, and return its position.
+     *
+     * @param x     Tap position on X-axis
+     * @param y     Tap position on Y-axis
+     * @return      Position of child user tapped.
+     */
     private int findMotionItem(float x, float y) {
         int width = getWidth();
         int height = getHeight();
@@ -312,7 +329,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
             rowsNum = 1;
         } else {
             unitWidth = (float) width / numOfColumns;
-            rowsNum = count / numOfColumns + (count % numOfColumns > 0 ? 1: 0);
+            rowsNum = count / numOfColumns + (count % numOfColumns > 0 ? 1 : 0);
             unitHeight = (float) width / rowsNum;
         }
 
@@ -337,6 +354,41 @@ public class TileWall extends AdapterView<BaseAdapter> {
             return INVALID_POSITION;
         } else {
             return index;
+        }
+    }
+
+    /**
+     * Judge whether user move out of the child that was tapped.
+     *
+     * @param moveX     Current position on X-axis
+     * @param moveY     Current position on Y-axis
+     * @return          True if out of child's bounds, else false.
+     */
+    private boolean isOutOfChildBounds(float moveX, float moveY) {
+        return moveX > pressedChild.getRight() || moveY > pressedChild.getBottom()
+                || moveX < pressedChild.getLeft() || moveY < pressedChild.getTop();
+    }
+
+    /**
+     * Judge whether we can think the user is scrolling.
+     *
+     * @param distX     Moving distance on X-axis
+     * @param distY     Moving distance on Y-axis
+     * @return          True if user is scrolling, else false.
+     */
+    private boolean isStartDragging(float distX, float distY) {
+        return distX * distX + distY * distY > touchSlop * touchSlop;
+    }
+
+    /**
+     * When the motion events were dealt, reset the reference that point to the child which tapped
+     * by user. Reset the {@link #pressedPosition} too.
+     */
+    private void resetPressedChild() {
+        if (pressedPosition != INVALID_POSITION) {
+            pressedChild.setPressed(false);
+            pressedChild = null;
+            pressedPosition = INVALID_POSITION;
         }
     }
 
