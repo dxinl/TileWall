@@ -293,8 +293,8 @@ public class TileWall extends AdapterView<BaseAdapter> {
 
             case MotionEvent.ACTION_UP:
                 if (!isDragging && pressedPosition != INVALID_POSITION) {
-                    performItemClick(pressedChild, pressedPosition, mAdapter.getItemId(pressedPosition));
                     pressedChild.setPressed(false);
+                    performItemClick(pressedChild, pressedPosition, mAdapter.getItemId(pressedPosition));
                     return true;
                 } else {
                     isDragging = false;
@@ -350,7 +350,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
         }
 
         int index = rowIndex * columnsNum + columnIndex;
-        if (index < 0 || index >= count) {
+        if (index >= count) {
             return INVALID_POSITION;
         } else {
             return index;
