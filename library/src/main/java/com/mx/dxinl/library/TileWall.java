@@ -629,16 +629,20 @@ public class TileWall extends AdapterView<BaseAdapter> {
             int bottom = child.getBottom();
             // Elements in first column draw left divider
             if (i % numOfColumns == 0) {
-                canvas.drawLine(left - dividerWidth, top - dividerWidth, left - dividerWidth, bottom + dividerWidth, paint);
+                canvas.drawLine(left - dividerWidth, top - dividerWidth * 1.5f,
+                        left - dividerWidth, bottom + dividerWidth * 1.5f, paint);
             }
             // Elements in first row draw top divider
             if (i < numOfColumns) {
-                canvas.drawLine(left - dividerWidth, top - dividerWidth, right + dividerWidth, top - dividerWidth, paint);
+                canvas.drawLine(left - dividerWidth * 1.5f, top - dividerWidth,
+                        right + dividerWidth * 1.5f, top - dividerWidth, paint);
             }
 
             // All elements draw right and bottom divider
-            canvas.drawLine(right + dividerWidth, top - dividerWidth, right + dividerWidth, bottom + dividerWidth, paint);
-            canvas.drawLine(left - dividerWidth, bottom + dividerWidth, right + dividerWidth, bottom + dividerWidth, paint);
+            canvas.drawLine(right + dividerWidth, top - dividerWidth * 1.5f,
+                    right + dividerWidth, bottom + dividerWidth * 1.5f, paint);
+            canvas.drawLine(left - dividerWidth * 1.5f, bottom + dividerWidth,
+                    right + dividerWidth * 1.5f, bottom + dividerWidth, paint);
         }
     }
 
