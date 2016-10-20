@@ -32,10 +32,10 @@ public class TileWall extends AdapterView<BaseAdapter> {
     private int numOfColumns;
     private int numOfRows;
     private int dividerColor;
+    private int dividerWidth;
     private int touchSlop;
     private float downMotionX;
     private float downMotionY;
-    private float dividerWidth;
     /**
      * This flag will work only when both width measure spec mode and height measure spec mode
      * are {@link MeasureSpec#EXACTLY}.
@@ -83,7 +83,8 @@ public class TileWall extends AdapterView<BaseAdapter> {
                 R.styleable.TileWall_numOfRows, DEF_NUM_OF_ROW_AND_COLUMNS);
         numOfColumns = typedArray.getInt(
                 R.styleable.TileWall_numOfColumns, DEF_NUM_OF_ROW_AND_COLUMNS);
-        dividerWidth = typedArray.getDimension(R.styleable.TileWall_dividerWidth, 1);
+        dividerWidth = typedArray.getDimensionPixelSize(R.styleable.TileWall_dividerWidth,
+                getResources().getDimensionPixelSize(R.dimen.deafult_divider_width));
         dividerColor = typedArray.getColor(
                 R.styleable.TileWall_dividerColor,
                 getResources().getColor(R.color.grey_400));
@@ -476,7 +477,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
 
         int paddingHorizontal = getPaddingLeft() + getPaddingRight();
         int columnsCount = count > numOfColumns ? numOfColumns : count;
-        int totalDividerWidth = (int) (dividerWidth * (columnsCount + 1));
+        int totalDividerWidth = dividerWidth * (columnsCount + 1);
         return maxWidth * columnsCount + totalDividerWidth + paddingHorizontal;
     }
 
@@ -511,7 +512,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
 
         int paddingVertical = getPaddingTop() + getPaddingBottom();
         int rowsCount = (count / numOfColumns) + (count % numOfColumns > 0 ? 1 : 0);
-        int totalDividerHeight = (int) (dividerWidth * (rowsCount + 1));
+        int totalDividerHeight = dividerWidth * (rowsCount + 1);
         return maxHeight * rowsCount + totalDividerHeight + paddingVertical;
     }
 
@@ -529,24 +530,36 @@ public class TileWall extends AdapterView<BaseAdapter> {
 
         int width;
         int height;
-        if (!forceDividing && count < numOfColumns) {
-            int totalDividerWidth = (int) (dividerWidth * (count + 1));
-            int totalDividerHeight = (int) (dividerWidth * 2);
-            width = (getWidth() - totalDividerWidth - paddingHorizontal) / count;
-            height = (getHeight() - totalDividerHeight - paddingVertical);
-        } else {
-            int totalDividerWidth = (int) (dividerWidth * (numOfColumns + 1));
-            width = (getWidth() - totalDividerWidth - paddingHorizontal) / numOfColumns;
+        int totalDividerWidth;
+        int totalDividerHeight;
+        int columnsCount;
+        int rowsCount;
 
-            int rowsCount = count / numOfColumns + (count % numOfColumns > 0 ? 1 : 0);
+        if (!forceDividing && count < numOfColumns) {
+            totalDividerWidth = dividerWidth * (count * 2);
+            totalDividerHeight = dividerWidth * 2;
+            columnsCount = count;
+            rowsCount = 1;
+        } else {
+            totalDividerWidth = dividerWidth * (numOfColumns * 2);
+            columnsCount = numOfRows;
+
+            rowsCount = count / numOfColumns + (count % numOfColumns > 0 ? 1 : 0);
             if (!forceDividing && rowsCount < numOfRows) {
-                int totalDividerHeight = (int) (dividerWidth * (rowsCount + 1));
-                height = (getHeight() - totalDividerHeight - paddingVertical) / rowsCount;
+                totalDividerHeight = dividerWidth * (rowsCount * 2);
             } else {
-                int totalDividerHeight = (int) (dividerWidth * (numOfRows + 1));
-                height = (getHeight() - totalDividerHeight - paddingVertical) / numOfRows;
+                totalDividerHeight = dividerWidth * (numOfRows * 2);
+                rowsCount = numOfRows;
             }
         }
+
+        // Calculate items' width
+        int actualWidth = getWidth() - totalDividerWidth - paddingHorizontal;
+        width = actualWidth / columnsCount;
+
+        // Calculate item's height
+        int actualHeight = getHeight() - totalDividerHeight - paddingVertical;
+        height = actualHeight / rowsCount;
 
         for (int i = 0; i < numOfRows; i++) {
             for (int j = 0; j < numOfColumns; j++) {
@@ -560,9 +573,9 @@ public class TileWall extends AdapterView<BaseAdapter> {
                     continue;
                 }
 
-                int left = (int) ((dividerWidth * (j + 1)) + width * j) + paddingLeft;
+                int left = dividerWidth * (j * 2 + 1) + width * j + paddingLeft;
                 int right = left + width;
-                int top = (int) ((dividerWidth * (i + 1)) + height * i) + paddingTop;
+                int top = dividerWidth * (i * 2 + 1) + height * i + paddingTop;
                 int bottom = top + height;
 
                 int childWidthMeasureSpec = MeasureSpec.makeMeasureSpec(width, MeasureSpec.EXACTLY);
@@ -616,16 +629,16 @@ public class TileWall extends AdapterView<BaseAdapter> {
             int bottom = child.getBottom();
             // Elements in first column draw left divider
             if (i % numOfColumns == 0) {
-                canvas.drawLine(left, top - dividerWidth, left, bottom + dividerWidth, paint);
+                canvas.drawLine(left - dividerWidth, top - dividerWidth, left - dividerWidth, bottom + dividerWidth, paint);
             }
             // Elements in first row draw top divider
             if (i < numOfColumns) {
-                canvas.drawLine(left - dividerWidth, top, right + dividerWidth, top, paint);
+                canvas.drawLine(left - dividerWidth, top - dividerWidth, right + dividerWidth, top - dividerWidth, paint);
             }
 
             // All elements draw right and bottom divider
-            canvas.drawLine(right, top - dividerWidth, right, bottom + dividerWidth, paint);
-            canvas.drawLine(left - dividerWidth, bottom, right + dividerWidth, bottom, paint);
+            canvas.drawLine(right + dividerWidth, top - dividerWidth, right + dividerWidth, bottom + dividerWidth, paint);
+            canvas.drawLine(left - dividerWidth, bottom + dividerWidth, right + dividerWidth, bottom + dividerWidth, paint);
         }
     }
 
@@ -642,7 +655,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
     }
 
     @SuppressWarnings("unused")
-    public TileWall setDividerWidth(float dividerWidth) {
+    public TileWall setDividerWidth(int dividerWidth) {
         this.dividerWidth = dividerWidth;
         return this;
     }
