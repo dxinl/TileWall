@@ -43,7 +43,6 @@ public class TileWall extends AdapterView<BaseAdapter> {
     private boolean forceDividing;
     private boolean needToUpdateView;
     private boolean isDragging;
-    private String tag = TileWall.class.getSimpleName();
 
     /**
      * Reference of child that user taps on.
