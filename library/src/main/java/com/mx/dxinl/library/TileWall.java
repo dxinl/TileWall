@@ -541,7 +541,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
             rowsCount = 1;
         } else {
             totalDividerWidth = dividerWidth * (numOfColumns * 2);
-            columnsCount = numOfRows;
+            columnsCount = numOfColumns;
 
             rowsCount = count / numOfColumns + (count % numOfColumns > 0 ? 1 : 0);
             if (!forceDividing && rowsCount < numOfRows) {
