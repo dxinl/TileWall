@@ -5,6 +5,8 @@
 ## Preview
 ![tupian](preview.png)
 ## How to Use
+### Apply to gradle script
+```    compile 'com.mx.dxinl:tilewall:0.0.2'```
 ### Java code
 ```java
 TileWall mTileWall = new TileWall(context)
