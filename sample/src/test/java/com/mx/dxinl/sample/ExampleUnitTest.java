@@ -1,4 +1,4 @@
-package com.mx.dxinl.library;
+package com.mx.dxinl.sample;
 
 import org.junit.Test;
 

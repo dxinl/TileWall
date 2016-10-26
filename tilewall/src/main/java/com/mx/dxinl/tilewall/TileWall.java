@@ -1,4 +1,4 @@
-package com.mx.dxinl.library;
+package com.mx.dxinl.tilewall;
 
 import android.annotation.TargetApi;
 import android.content.Context;

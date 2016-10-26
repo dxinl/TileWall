@@ -42,7 +42,7 @@ ext {
     gitUrl = 'https://github.com/dxinl/TileWall.git'
 
     //版本号
-    libraryVersion = '0.0.1'
+    libraryVersion = '0.0.2'
     libraryName = 'TileWall'
     libraryDescription = 'Tile wall widget for Android'
 

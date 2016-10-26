@@ -1,4 +1,4 @@
-package com.mx.dxinl.tilewall;
+package com.mx.dxinl.sample;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -8,7 +8,7 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
 
-import com.mx.dxinl.library.TileWall;
+import com.mx.dxinl.tilewall.TileWall;
 
 import java.util.ArrayList;
 import java.util.List;

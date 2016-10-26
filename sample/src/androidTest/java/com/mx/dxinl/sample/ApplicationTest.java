@@ -1,4 +1,4 @@
-package com.mx.dxinl.library;
+package com.mx.dxinl.sample;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

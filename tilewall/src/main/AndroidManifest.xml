@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.mx.dxinl.library">
+    package="com.mx.dxinl.tilewall">
 
     <application
         android:allowBackup="true"

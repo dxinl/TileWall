@@ -1,4 +1,4 @@
-package com.mx.dxinl.tilewall;
+package com.mx.dxinl.sample;
 
 import android.content.Context;
 import android.view.LayoutInflater;
