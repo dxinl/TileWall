@@ -1,4 +1,6 @@
 apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: "com.jfrog.bintray"
 
 android {
     compileSdkVersion 24
@@ -19,7 +21,60 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:24.1.1'
+    compile 'com.android.support:support-annotations:25.0.0'
+}
+
+ext {
+    //bintray上的仓库名，一般为maven
+    bintrayRepo = 'mx0408/AndroidMaven'
+    //bintray上的项目名
+    bintrayName = 'tilewall'
+
+    //JCenter的GroupId
+    publishedGroupId = 'com.mx.dxinl'
+    //JCenter的ArtifactId
+    artifact = 'tilewall'
+
+    siteUrl = 'https://github.com/dxinl/TileWall'
+    gitUrl = 'https://github.com/dxinl/TileWall.git'
+
+    //版本号
+    libraryVersion = '0.0.1'
+    libraryName = 'TileWall'
+    libraryDescription = 'Tile wall widget for Android'
+
+    //开发者信息
+    developerId = 'dxinl'
+    developerName = 'Xinliang Deng'
+    developerEmail = 'dxinl0307@gmail.com'
+
+    //以上所有信息自行修改，以下不变
+    licenseName = 'MIT'
+    licenseUrl = 'https://opensource.org/licenses/MIT'
+    allLicenses = ["MIT"]
+}
+apply from:'https://cdn.rawgit.com/Jude95/JCenter/master/install.gradle'
+apply from:'https://cdn.rawgit.com/Jude95/JCenter/master/bintray.gradle'
+
+def siteUrl = 'https://github.com/dxinl/TileWall'
+def gitUrl = 'https://github.com/dxinl/TileWall.git'
+
+Properties properties = new Properties()
+properties.load(project.rootProject.file('local.properties').newDataInputStream())
+bintray {
+    user = properties.getProperty("bintray.user")
+    key = properties.getProperty("bintray.apikey")
+    configurations = ['archives']
+    pkg {
+        repo = "AndroidMaven"
+        name = "tilewall"
+        websiteUrl = siteUrl
+        vcsUrl = gitUrl
+        userOrg = properties.getProperty("bintray.userorg")
+        licenses = ["Apache-2.0"]
+        publish = true
+    }
 }
