@@ -263,7 +263,9 @@ public class TileWall extends AdapterView<BaseAdapter> {
                 pressedPosition = findMotionItem(event.getX(), event.getY());
                 if (pressedPosition != INVALID_POSITION) {
                     pressedChild = getChildAt(pressedPosition);
-                    pressedChild.setPressed(true);
+                    if (pressedChild.isEnabled()) {
+                        pressedChild.setPressed(true);
+                    }
                 }
                 return true;
 
@@ -295,7 +297,7 @@ public class TileWall extends AdapterView<BaseAdapter> {
                 break;
 
             case MotionEvent.ACTION_UP:
-                if (!isDragging && pressedPosition != INVALID_POSITION) {
+                if (!isDragging && pressedPosition != INVALID_POSITION && pressedChild.isEnabled()) {
                     pressedChild.setPressed(false);
                     performItemClick(pressedChild, pressedPosition, mAdapter.getItemId(pressedPosition));
                     return true;
