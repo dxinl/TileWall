@@ -132,6 +132,11 @@ public class TileWall extends AdapterView<BaseAdapter> {
 
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
+        if (mAdapter == null) {
+            super.onMeasure(widthMeasureSpec, heightMeasureSpec);
+            return;
+        }
+
         int count = getChildCount();
         if (changedAdapter) {
             addNewChildren();
@@ -520,6 +525,9 @@ public class TileWall extends AdapterView<BaseAdapter> {
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
         int count = getChildCount();
+        if (count == 0) {
+            return;
+        }
 
         int paddingLeft = getPaddingLeft();
         int paddingRight = getPaddingRight();
@@ -615,6 +623,10 @@ public class TileWall extends AdapterView<BaseAdapter> {
 
     private void drawDivider(Canvas canvas) {
         int count = getChildCount();
+        if (count == 0) {
+            return;
+        }
+
         paint.setColor(dividerColor);
         paint.setStrokeWidth(dividerWidth);
 
