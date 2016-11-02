@@ -6,7 +6,7 @@
 ![tupian](preview.png)
 ## How to Use
 ### Apply to gradle script
-```    compile 'com.mx.dxinl:tilewall:0.0.2'```
+```    compile 'com.mx.dxinl:tilewall:0.0.4'```
 ### Java code
 ```java
 TileWall mTileWall = new TileWall(context)
@@ -34,3 +34,5 @@ This view support multi view type also.
 
 ### Notice
 ```setForceDividing(boolean)``` will work only when both width measure spec mode and height measure spec mode are ```MeasureSpec.EXACTLY```.
+
+This widget is not recommended showing too many data because of performance issues.
