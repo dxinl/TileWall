@@ -74,7 +74,7 @@ bintray {
         websiteUrl = siteUrl
         vcsUrl = gitUrl
         userOrg = properties.getProperty("bintray.userorg")
-        licenses = ["Apache-2.0"]
+        licenses = ["MIT"]
         publish = true
     }
 }
