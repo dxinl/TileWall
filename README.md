@@ -20,7 +20,7 @@ mTileWall.setAdapter(new BaseAdaper() {...});
 ```
 ### Or XML code
 ```xml
-<com.mx.dxinl.library.TileWall
+<com.mx.dxinl.tilewall.TileWall
     android:id="@+id/tileWall"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
